@@ -17,7 +17,7 @@ This collection is convenient because it combines the functionality of other dat
 We'll start by creating our internal representation for the ArrayLimitedQueue. Since the idea of a set is similar to that of an array, we will use an array to represent our set. We need to be able to compare the individual elements. Thus, any type must conform to the [Comparable Protocol](https://developer.apple.com/library/watchos/documentation/Swift/Reference/Swift_Comparable_Protocol/index.html). 
 For easy printing, [Customstringconvertible](https://developer.apple.com/reference/swift/customstringconvertible) is used.
 
-``swift
+```swift
 public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
 
 private var internalArray = [T]()
@@ -36,11 +36,11 @@ outputString.append(", ")
 outputString.append("]")
 return outputString
 }
-``
+```
 
 It is also possible to configure additional properties that support the change after creating or inserting elements:
 
-``swift
+```swift
 public var maxSize: Int = 1 {
 didSet {
 let sizeDiff = internalArray.count - maxSize
@@ -75,12 +75,12 @@ internalArray = internalArray.reversed().reduce([]){$0.contains($1) ? $0 : $0 + 
 }
 }
 }
-``
+```
 > **Note:** When using custom types, you need to set the zeroValue.
 
 Lets take a look at the `add()` function first. This first checks if the item already exists in the collection and the property(deleteExisting) is set to a true value.
 
-``swift
+```swift
 public mutating func add(item: T) -> T? {
 
 if let index = indexOf(item: item), deleteExisting {
@@ -98,11 +98,11 @@ internalArray.append(item)
 
 return self.checkSize()
 }
-``
+```
 
 After `add()` a new element, the size of the array is checked. And if it exceeds a `maxSize`, the first element of the collection will be deleted:
 
-``swift
+```swift
 private mutating func checkSize() -> T? {
 
 guard
@@ -115,11 +115,11 @@ return nil
 internalArray.removeFirst()
 return first
 }
-``
+```
 
 Next up is the `removableItems()` function:
 
-``swift
+```swift
 public func removableItems(forMaxSize size: Int) -> [T] {
 
 var deletingArray = [T]()
@@ -136,7 +136,7 @@ sizeDiff -= 1
 
 return deletingArray
 }
-``
+```
 This function is necessary for those situations when you need to know what elements will be deleted after setting a new value `maxSize`.
 
 ## Examples
@@ -147,7 +147,7 @@ Below are a few examples that can be found in the playground file.
 
 Here we create a collection with several values.
 
-``swift
+```swift
 var limitedArray = ArrayLimitedQueue<Player>()
 
 //Unlimited size
@@ -164,49 +164,49 @@ limitedArray.add(item: 3)
 limitedArray.add(item: 8)
 
 //IntArray: [2, 5, 3, -5, 1, 3, 8]
-``
+```
 Now let's check what elements will be deleted at a possible new maximum size.
-``swift
+```swift
 print("Removable: \(intArray.removableItems(forMaxSize: 5))")
 //Removable: [2, 5]
-``
+```
 Let's check it out:
 
-``swift
+```swift
 limitedArray.maxSize = 5
 //IntArray: [3, -5, 1, 3, 8]
-``
+```
 We can get rid of negative values.
-``swift
+```swift
 limitedArray.positiveValues = true
 //IntArray: [3, 1, 3, 8]
-``
+```
 And most importantly, at any time we can remove duplicates (In the collection remains the last added).
-``swift
+```swift
 limitedArray.deleteExisting = true
 //IntArray: [1, 3, 8]
-``
+```
 
 ### Example 2
 
 In this example we take a look at something a bit more interesting. We define a `Player` struct as follows:
 
-``swift
+```swift
 public struct Player: Comparable {
 public var name: String
 public var points: Int
 }
-``
+```
 
 The `Player` also gets its own `==` and `<` operators. The `<` operator is used to determine the sort order of the set, while `==` determines whether two objects are really equal.
 
 Note that `==` compares both the name and the points:  
 
-``swift
+```swift
 func ==(x: Player, y: Player) -> Bool {
 return x.name == y.name && x.points == y.points
 }
-``
+```
 
 But `<` only compares the points:
 
@@ -219,7 +219,7 @@ return x.points < y.points
 Therefore, two `Player`s can each have the same value (the number of points), but are not guaranteed to be equal (they can have different names).
 
 We create a new collection and 5 random players. `add()` them to the collection, with two duplicates
-``swift
+```swift
 var limitedArray = ArrayLimitedQueue<Player>()
 
 limitedArray.maxSize = 0
@@ -249,10 +249,10 @@ Player(name: "PTEsCzSa", points: 2608), #6
 Player(name: "slRgehCg", points: -2026) #7
 ]
 */
-``
+```
 We will do all the operations as in the previous example.
 
-``swift
+```swift
 limitedArray.maxSize = 2
 limitedArray.zeroValue = Player(name: "Any", points: 0)
 limitedArray.positiveValues = true
@@ -261,7 +261,7 @@ limitedArray.deleteExisting = true
 /*
 [Player(name: "ehnx5gvL", points: 3797)] #6
 */
-``
+```
 Let's run through our actions:
 -a After installing a new maxSize(6), #1 one was deleted
 -a Then, the negative elements were removed(#3, #4, #5, #7)
