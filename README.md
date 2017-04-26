@@ -19,123 +19,123 @@ For easy printing, [Customstringconvertible](https://developer.apple.com/referen
 
 ```swift
 public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
-
-private var internalArray = [T]()
-...
-public var description: String {
-var outputString = "["
-
-for (index, item) in internalArray.enumerated() {
-outputString.append("\(item)")
-
-if index < internalArray.count - 1 {
-outputString.append(", ")
-}
-}
-
-outputString.append("]")
-return outputString
+    private var internalArray = [T]()
+    //...
+    public var description: String {
+        var outputString = "["
+        
+        for (index, item) in internalArray.enumerated() {
+            outputString.append("\(item)")
+            
+            if index < internalArray.count - 1 {
+                outputString.append(", ")
+            }
+        }
+        
+        outputString.append("]")
+        return outputString
+    }
 }
 ```
 
 It is also possible to configure additional properties that support the change after creating or inserting elements:
 
 ```swift
-public var maxSize: Int = 1 {
-didSet {
-let sizeDiff = internalArray.count - maxSize
-if 0 < sizeDiff && sizeDiff <= internalArray.count {
-internalArray.removeFirst(sizeDiff)
-}
-}
-}
+    public var maxSize: Int = 1 {
+        didSet {
+            let sizeDiff = internalArray.count - maxSize
+            if 0 < sizeDiff && sizeDiff <= internalArray.count {
+                internalArray.removeFirst(sizeDiff)
+            }
+        }
+    }
 
-public var zeroValue:T?
-public var positiveValues: Bool = false {
-didSet {
-if positiveValues {
-
-if let zero = zeroValue {
-internalArray = internalArray.filter{$0 > zero}.map{ $0 }
-
-} else if let defaultZero = 0 as? T {
-internalArray = internalArray.filter{$0 > defaultZero}.map{ $0 }
-
-} else {
-fatalError("A zeroValue is not setted")
-}
-}
-}
-}
-
-public var deleteExisting = true {
-didSet {
-if deleteExisting {
-internalArray = internalArray.reversed().reduce([]){$0.contains($1) ? $0 : $0 + [$1]}.reversed()
-}
-}
-}
+    public var zeroValue:T?
+    public var positiveValues: Bool = false {
+        didSet {
+            if positiveValues {
+                
+                if let zero = zeroValue {
+                    internalArray = internalArray.filter{$0 > zero}.map{ $0 }
+                    
+                } else if let defaultZero = 0 as? T {
+                    internalArray = internalArray.filter{$0 > defaultZero}.map{ $0 }
+                    
+                } else {
+                    fatalError("A zeroValue is not setted")
+                }
+            }
+        }
+    }
+    
+    public var deleteExisting = true {
+        didSet {
+            if deleteExisting {
+                internalArray = internalArray.reversed().reduce([]){$0.contains($1) ? $0 : $0 + [$1]}.reversed()
+            }
+        }
+    }
 ```
 > **Note:** When using custom types, you need to set the zeroValue.
 
 Lets take a look at the `add()` function first. This first checks if the item already exists in the collection and the property(deleteExisting) is set to a true value.
 
 ```swift
-public mutating func add(item: T) -> T? {
+    public mutating func add(item: T) -> T? {
 
-if let index = indexOf(item: item), deleteExisting {
-return internalArray.remove(at: index)
-}
-
-if positiveValues {
-
-guard let zero = 0 as? T, item > zero else {
-return nil
-}
-}
-
-internalArray.append(item)
-
-return self.checkSize()
-}
+        if let index = indexOf(item: item), deleteExisting {
+            return internalArray.remove(at: index)
+        }
+        
+        if positiveValues {
+            
+            guard let zero = zeroValue, zero < item else {
+                return nil
+            }
+        }
+        
+        internalArray.append(item)
+        
+        return self.checkSize()
+    }
 ```
 
 After `add()` a new element, the size of the array is checked. And if it exceeds a `maxSize`, the first element of the collection will be deleted:
 
 ```swift
-private mutating func checkSize() -> T? {
-
-guard
-0 < maxSize && maxSize < internalArray.count,
-let first = internalArray.first
-else {
-return nil
-}
-
-internalArray.removeFirst()
-return first
-}
+    private mutating func checkSize() -> T? {
+        
+        guard
+            0 < maxSize && maxSize < internalArray.count,
+            let first = internalArray.first
+        else {
+            return nil
+        }
+        
+        internalArray.removeFirst()
+        return first
+    }
 ```
 
 Next up is the `removableItems()` function:
 
 ```swift
-public func removableItems(forMaxSize size: Int) -> [T] {
-
-var deletingArray = [T]()
-var removingIndex = 0
-
-var sizeDiff = internalArray.count - size
-
-while sizeDiff > 0 {
-
-deletingArray.append(internalArray[removingIndex])
-removingIndex += 1
-sizeDiff -= 1
-}
-
-return deletingArray
-}
+    public func removableItems(forMaxSize size: Int) -> [T] {
+        
+        var deletingArray = [T]()
+        var removingIndex = 0
+        
+        var sizeDiff = internalArray.count - size
+        
+        while sizeDiff > 0 {
+            
+            deletingArray.append(internalArray[removingIndex])
+            removingIndex += 1
+            sizeDiff -= 1
+        }
+        
+        return deletingArray
+    }
 ```
 This function is necessary for those situations when you need to know what elements will be deleted after setting a new value `maxSize`.
 
@@ -210,11 +210,11 @@ return x.name == y.name && x.points == y.points
 
 But `<` only compares the points:
 
-``swift
+```swift
 func <(x: Player, y: Player) -> Bool {
 return x.points < y.points
 }
-``
+```
 
 Therefore, two `Player`s can each have the same value (the number of points), but are not guaranteed to be equal (they can have different names).
 
@@ -263,9 +263,9 @@ limitedArray.deleteExisting = true
 */
 ```
 Let's run through our actions:
--a After installing a new maxSize(6), #1 one was deleted
--a Then, the negative elements were removed(#3, #4, #5, #7)
--a Finally, we got rid of the duplicate(#2)
+- a After installing a new maxSize(6), #1 one was deleted.
+- a Then, the negative elements were removed(#3, #4, #5, #7).
+- a Finally, we got rid of the duplicate(#2).
 
 *Written By Sergey Pugach*
 
