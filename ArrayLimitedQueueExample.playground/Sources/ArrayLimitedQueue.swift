@@ -13,7 +13,7 @@ Array Limited Queue is a collection that has the features
 
 import Foundation
 
-public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
+public struct ArrayLimitedQueue<T: Comparable> {
     
     //The maximum number of items in the collection. Can be changed after
     public var maxSize: Int = 1 {
@@ -29,16 +29,13 @@ public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
     After the change from true to false. Negative values will be deleted
     Note: When using custom types, you need to set the zeroValue.
      */
-    public var zeroValue:T?
+    public var zeroValue:T? = 0 as? T
     public var positiveValues: Bool = false {
         didSet {
             if positiveValues {
                 
                 if let zero = zeroValue {
-                    internalArray = internalArray.filter{$0 > zero}.map{ $0 }
-                    
-                } else if let defaultZero = 0 as? T {
-                    internalArray = internalArray.filter{$0 > defaultZero}.map{ $0 }
+                internalArray = internalArray.filter{$0 > zero}.map{ $0 }
                     
                 } else {
                     fatalError("A zeroValue is not setted")
@@ -162,21 +159,5 @@ public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
     public subscript(index: Int) -> T {
         assert(index >= 0 && index < count)
         return internalArray[index]
-    }
-    
-    
-    public var description: String {
-        var outputString = "["
-        
-        for (index, item) in internalArray.enumerated() {
-            outputString.append("\(item)")
-            
-            if index < internalArray.count - 1 {
-                outputString.append(", ")
-            }
-        }
-        
-        outputString.append("]")
-        return outputString
     }
 }

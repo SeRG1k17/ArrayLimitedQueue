@@ -1,6 +1,6 @@
 # ArrayLimitedQueue
 
-Array Limited Queue is a collection that has the features of a regular array (only get + limited size), queues and sets. The way you value and compare items can be user-defined.
+Array Limited Queue is a collection that has the features of a regular array (only get + limited size), queues and sets. The way you evaluate and compare items can be determined by the user.
 
 The Ordered Set data type is a hybrid of:
 - a [Queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)), is a list where you can only insert new items at the back and remove items from the front. This ensures that the first item you enqueue is also the first item you dequeue. First come, first serve!
@@ -14,27 +14,12 @@ This collection is convenient because it combines the functionality of other dat
 
 ## The code
 
-We'll start by creating our internal representation for the ArrayLimitedQueue. Since the idea of a set is similar to that of an array, we will use an array to represent our set. We need to be able to compare the individual elements. Thus, any type must conform to the [Comparable Protocol](https://developer.apple.com/library/watchos/documentation/Swift/Reference/Swift_Comparable_Protocol/index.html). 
-For easy printing, [Customstringconvertible](https://developer.apple.com/reference/swift/customstringconvertible) is used.
+We'll start by creating our internal representation for the ArrayLimitedQueue. Since the idea of a set is similar to that of an array, we will use an array to represent our set. We need to be able to compare the individual elements. Thus, any type must conform to the [Comparable Protocol](https://developer.apple.com/library/watchos/documentation/Swift/Reference/Swift_Comparable_Protocol/index.html).
 
 ```swift
-public struct ArrayLimitedQueue<T: Comparable> : CustomStringConvertible {
+public struct ArrayLimitedQueue<T: Comparable> {
     private var internalArray = [T]()
     //...
-    public var description: String {
-        var outputString = "["
-        
-        for (index, item) in internalArray.enumerated() {
-            outputString.append("\(item)")
-            
-            if index < internalArray.count - 1 {
-                outputString.append(", ")
-            }
-        }
-        
-        outputString.append("]")
-        return outputString
-    }
 }
 ```
 
@@ -148,7 +133,7 @@ Below are a few examples that can be found in the playground file.
 Here we create a collection with several values.
 
 ```swift
-var limitedArray = ArrayLimitedQueue<Player>()
+var limitedArray = ArrayLimitedQueue<Int>()
 
 //Unlimited size
 limitedArray.maxSize = 0

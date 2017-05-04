@@ -22,9 +22,9 @@ limitedArray.add(item: player5)
 limitedArray.add(item: player2)
 limitedArray.add(item: player3)
 
-print(limitedArray)
+print(limitedArray.array)
 limitedArray.maxSize = 6
 limitedArray.zeroValue = Player(name: "Any", points: 0)
 limitedArray.positiveValues = true
 limitedArray.deleteExisting = true
-print(limitedArray)
+print(limitedArray.array)
