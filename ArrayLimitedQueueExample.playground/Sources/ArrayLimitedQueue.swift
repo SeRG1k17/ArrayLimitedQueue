@@ -16,9 +16,9 @@ import Foundation
 public struct ArrayLimitedQueue<T: Comparable> {
     
     //The maximum number of items in the collection. Can be changed after
-    public var maxSize: Int = 1 {
+    public var maxStoredItems: Int = 1 {
         didSet {
-            let sizeDiff = internalArray.count - maxSize
+            let sizeDiff = internalArray.count - maxStoredItems
             if 0 < sizeDiff && sizeDiff <= internalArray.count {
                 internalArray.removeFirst(sizeDiff)
             }
@@ -51,13 +51,17 @@ public struct ArrayLimitedQueue<T: Comparable> {
     public var deleteExisting = true {
         didSet {
             if deleteExisting {
-                internalArray = internalArray.reversed().reduce([]){$0.contains($1) ? $0 : $0 + [$1]}.reversed()
+                for i in stride(from: internalArray.count - 1, to: 0, by: -1) {
+
+                    for j in stride(from: i - 1, to: 0, by: -1) {
+                        
+                        if internalArray[i] == internalArray[j] {
+                            internalArray.remove(at: j)
+                        }
+                    }
+                }
             }
         }
-    }
-    
-    func removeDuplicates(accumulator: [T], element: T) -> [T] {
-        return accumulator.contains(element) ? accumulator : accumulator + [element]
     }
     
     public var array: [T] {
@@ -130,7 +134,7 @@ public struct ArrayLimitedQueue<T: Comparable> {
     private mutating func checkSize() -> T? {
         
         guard
-            0 < maxSize && maxSize < internalArray.count,
+            0 < maxStoredItems && maxStoredItems < internalArray.count,
             let first = internalArray.first
         else {
             return nil
